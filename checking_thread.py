@@ -27,6 +27,7 @@ class UpdateChecker(threading.Thread):
 
     def run(self) -> None:
         self.driver.get(self.url)
+        print("Starting selenium")
         while not self.condition(self.match, self.driver):
             print("Checking")
             self.delegate.on_condition_not_accepted()

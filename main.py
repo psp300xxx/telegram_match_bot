@@ -118,7 +118,6 @@ async def check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("You have been inserted in queue, users are: '{}'".format(len(DELEGATE.user_ids)))
 
 
-print("Running")
 
 app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
@@ -133,6 +132,8 @@ thread = checking_thread.UpdateChecker(match=MATCH, url=SALERNITANA_LINK, condit
 thread.start()
 
 # asyncio.run(check_match_availability(MATCH, SALERNITANA_LINK, users))
+
+print("Running")
 
 app.run_polling()
 
