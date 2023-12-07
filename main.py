@@ -67,6 +67,9 @@ class DelegateImpl(checking_thread.UpdateDelegate):
 
     def on_condition_not_accepted(self):
         self.lock.acquire()
+        for id in self.user_ids:
+            loop = MAIN_THREAD_LOOP
+            loop.create_task( app.updater.bot.send_message(id, "Match tickets are  not available at '{}'".format(SALERNITANA_LINK)) )
         self.lock.release()
 
 
