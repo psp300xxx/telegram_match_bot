@@ -76,10 +76,10 @@ def get_driver() -> webdriver:
     global driver
     lock.acquire()
     if driver is None:
-        options = Options()
-        options.headless = True
+        opts = webdriver.firefox.options.Options()
+        opts.add_argument("--headless")
         service = Service(executable_path='./geckodriver')
-        driver = webdriver.Firefox(service=service,options=options)
+        driver = webdriver.Firefox(service=service,options=opts)
     return driver
 
 def release_driver():
