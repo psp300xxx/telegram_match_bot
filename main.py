@@ -24,7 +24,6 @@ TELEGRAM_TOKEN = "6528189438:AAFYNfbhtrnrFFyVms2mNRgXSTDP0rFNmBg"
 SALERNITANA_LINK = "https://salernitana.it/biglietteria/"
 MATCH = "Salernitana - Milan"
 
-lock: Lock = RLock()
 driver: webdriver = None
 
 MAIN_THREAD_LOOP = asyncio.get_event_loop()
@@ -77,16 +76,13 @@ DELEGATE = DelegateImpl()
 
 def get_driver() -> webdriver:
     global driver
-    lock.acquire()
     if driver is None:
         opts = webdriver.firefox.options.Options()
         opts.add_argument("--headless")
         service = Service(executable_path='./geckodriver')
         driver = webdriver.Firefox(service=service,options=opts)
+        print("driver created")
     return driver
-
-def release_driver():
-    lock.release()
 
 def add_to_users(user):
     global DELEGATE
@@ -128,6 +124,8 @@ app.add_handler(CommandHandler("check", check))
 
 
 thread = checking_thread.UpdateChecker(match=MATCH, url=SALERNITANA_LINK, condition=link_available, driver=get_driver(), delegate=DELEGATE)
+
+print("thread object created")
 
 thread.start()
 
