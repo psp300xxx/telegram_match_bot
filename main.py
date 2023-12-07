@@ -6,6 +6,7 @@ from threading import Lock, RLock
 import asyncio
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.firefox.service import Service
 
 import checking_thread
 
@@ -77,7 +78,8 @@ def get_driver() -> webdriver:
     if driver is None:
         options = Options()
         options.headless = True
-        driver = webdriver.Firefox(options=options, executable_path='./geckodriver')
+        service = Service(executable_path='./geckodriver')
+        driver = webdriver.Firefox(service=service,options=options)
     return driver
 
 def release_driver():
