@@ -5,6 +5,8 @@ import time
 from threading import Lock, RLock
 import asyncio
 
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
 import checking_thread
 
 import telegram
@@ -75,7 +77,8 @@ def get_driver() -> webdriver:
     if driver is None:
         options = Options()
         options.headless = True
-        driver = webdriver.Firefox()
+        binary = FirefoxBinary('./geckodriver')
+        driver = webdriver.Firefox(firefox_binary=binary, options=options)
     return driver
 
 def release_driver():
@@ -110,6 +113,8 @@ async def check(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     add_to_users( update.effective_user.id )
     await update.message.reply_text("You have been inserted in queue, users are: '{}'".format(len(DELEGATE.user_ids)))
 
+
+print("Running")
 
 app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
