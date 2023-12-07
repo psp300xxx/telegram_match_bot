@@ -77,8 +77,7 @@ def get_driver() -> webdriver:
     if driver is None:
         options = Options()
         options.headless = True
-        binary = FirefoxBinary('./geckodriver')
-        driver = webdriver.Firefox(firefox_binary=binary, options=options)
+        driver = webdriver.Firefox(options=options, executable_path='./geckodriver')
     return driver
 
 def release_driver():
