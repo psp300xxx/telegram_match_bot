@@ -65,9 +65,7 @@ class DelegateImpl(checking_thread.UpdateDelegate):
 
 
     def on_condition_not_accepted(self):
-        self.lock.acquire()
-        print("Checked but no match tickets are available")
-        self.lock.release()
+        pass
 
 
 DELEGATE = DelegateImpl()
