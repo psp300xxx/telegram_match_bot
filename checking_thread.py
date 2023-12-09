@@ -25,13 +25,28 @@ class UpdateChecker(threading.Thread):
         self.driver = driver
         self.delegate = delegate
 
+    def _driver_get(self):
+        done = False
+        attempts = 30
+        exception: Exception = None
+        while not done and attempts > 0:
+            try:
+                self.driver.get(self.url)
+                done = True
+            except Exception as exc:
+                exception = exc
+                attempts -= 1
+                done = False
+        if attempts <= 0:
+            raise RuntimeError("Unable to connect due to: '{}'".format(str(exception)))
+
     def run(self) -> None:
         self.driver.get(self.url)
         print("Starting selenium")
         while not self.condition(self.match, self.driver):
             self.delegate.on_condition_not_accepted()
             time.sleep(10)
-            self.driver.get(self.url)
+            self._driver_get()
         self.delegate.on_condition_accepted()
         self.driver.close()
 
