@@ -1,6 +1,8 @@
 import threading
 import time
 from typing import Callable
+import requests
+from requests import Response
 
 from selenium.webdriver.firefox import webdriver
 
@@ -49,4 +51,33 @@ class UpdateChecker(threading.Thread):
             self._driver_get()
         self.delegate.on_condition_accepted()
         self.driver.close()
+
+class UpdateCheckerWithHTTPRequests(threading.Thread):
+
+    def __init__(self, match: str, url: str, condition: Callable, delegate: UpdateDelegate = None, *args, **kwargs):
+        super(UpdateCheckerWithHTTPRequests, self).__init__()
+        self.match : str = match
+        self.url : str = url
+        self.condition : Callable[[str, str], bool] = condition
+        self.delegate = delegate
+
+
+    def _get_next_response(self) -> Response:
+        attempts = 30
+        response = requests.get(self.url)
+        while not response.status_code == 200 and attempts > 0:
+            response = requests.get(self.url)
+            attempts -= 1
+        if attempts == 0:
+            raise RuntimeError("Response failed with status code: '{}'".format(response.status_code))
+        return response
+
+
+    def run(self) -> None:
+        response = self._get_next_response()
+        while not self.condition(self.match, response.content.decode("utf-8")):
+            self.delegate.on_condition_not_accepted()
+            time.sleep(10)
+            response = self._get_next_response()
+        self.delegate.on_condition_accepted()
 

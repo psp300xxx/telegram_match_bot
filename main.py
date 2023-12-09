@@ -5,6 +5,7 @@ import time
 from threading import Lock, RLock
 import asyncio
 
+import bs4
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.service import Service
 
@@ -18,6 +19,7 @@ from selenium.webdriver.firefox.options import Options
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from selenium import webdriver
+from bs4 import BeautifulSoup
 import json
 TELEGRAM_TOKEN = "6528189438:AAFYNfbhtrnrFFyVms2mNRgXSTDP0rFNmBg"
 
@@ -30,6 +32,13 @@ MAIN_THREAD_LOOP = asyncio.get_event_loop()
 
 INFO_JSON_PATH = "./users_info.json"
 
+def check_html(match: str, html_text: str) -> bool:
+    soup = bs4.BeautifulSoup(html_text, "html.parser")
+    all_strong_tags = soup.find_all("strong")
+    for tag in all_strong_tags:
+        if match in tag.text:
+            return True
+    return False
 
 class DelegateImpl(checking_thread.UpdateDelegate):
 
@@ -118,8 +127,8 @@ app.add_handler(CommandHandler("hello", hello))
 app.add_handler(CommandHandler("check", check))
 
 
-
-thread = checking_thread.UpdateChecker(match=MATCH, url=SALERNITANA_LINK, condition=link_available, driver=get_driver(), delegate=DELEGATE)
+thread = checking_thread.UpdateCheckerWithHTTPRequests(match=MATCH, url=SALERNITANA_LINK, condition=check_html, delegate=DELEGATE)
+# thread = checking_thread.UpdateChecker(match=MATCH, url=SALERNITANA_LINK, condition=link_available, driver=get_driver(), delegate=DELEGATE)
 
 print("thread object created")
 
